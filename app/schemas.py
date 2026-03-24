@@ -1,6 +1,10 @@
 from datetime import datetime
 from pydantic import BaseModel, EmailStr
 
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str  # usually "bearer"
+    
 class UserRegister(BaseModel):
     email: EmailStr
     password: str
@@ -30,3 +34,15 @@ class ProductResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class CartItemCreate(BaseModel):
+    product_id: int
+    quantity: int
+
+class OrderResponse(BaseModel):
+    id: int
+    total_amount: float
+    status: str
+    created_at : datetime
+
+    class Config:
+        from_attributes = True

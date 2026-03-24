@@ -35,13 +35,13 @@ def get_all_items(db: Session = Depends(get_db), current_user: User = Depends(ge
     return items
 
 
-@router.delete("/cart/{id}")
-def delete_products(id: int ,db: Session = Depends(get_db)):
-    product_by_id = db.query(Product).filter(Product.id == id).first()
-    if not product_by_id:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="product not found")
+@router.delete("/cart/{item_id}")
+def delete_item(item_id: int ,db: Session = Depends(get_db),current_user: User = Depends(get_current_user)):
+    cart_by_id = db.query(CartItem).filter(CartItem.id == item_id).first()
+    if not cart_by_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="cart not found")
 
-    db.delete(product_by_id)
+    db.delete(cart_by_id)
     db.commit()
 
-    return {"message": "product deleted"}
+    return {"message": "item deleted"}

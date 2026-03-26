@@ -4,7 +4,7 @@ from app.database import get_db
 from sqlalchemy.orm import Session
 from app.models import User
 from app.services.auth import hash_password, verify_password, create_token
-router = APIRouter()
+router = APIRouter(tags=["Auth"])
 
 @router.post("/register", response_model=UserResponse)
 def register(data: UserRegister , db: Session = Depends(get_db)):

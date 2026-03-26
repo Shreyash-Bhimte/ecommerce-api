@@ -6,7 +6,7 @@ from app.schemas import OrderResponse
 from app.dependencies import get_current_user
 
 
-router = APIRouter()
+router = APIRouter(tags=["Orders"])
 
 @router.post("/order",response_model= OrderResponse)
 def create_order(db: Session = Depends(get_db), current_user: User = Depends(get_current_user) ):

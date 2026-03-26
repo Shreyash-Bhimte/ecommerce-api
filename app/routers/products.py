@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.models import Product
 from app.schemas import ProductResponse,ProductCreate
 
-router = APIRouter()
+router = APIRouter(tags=["Products"])
 
 
 @router.get("/products",response_model=list[ProductResponse])

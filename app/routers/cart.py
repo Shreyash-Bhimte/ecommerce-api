@@ -6,7 +6,7 @@ from app.dependencies import get_current_user
 from app.schemas import CartItemCreate,ProductCreate
 
 
-router = APIRouter()
+router = APIRouter(tags=["Cart"])
 
 
 

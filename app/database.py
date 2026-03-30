@@ -1,11 +1,12 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 import os
-from dotenv import load_dotenv
 
-load_dotenv()
-
+# Get DATABASE_URL from environment variable (set by docker-compose)
 DATABASE_URL = os.getenv("DATABASE_URL")
+
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL environment variable not set!")
 
 engine = create_engine(DATABASE_URL)
 

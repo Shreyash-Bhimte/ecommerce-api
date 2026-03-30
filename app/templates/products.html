@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Products - My Shop</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        nav {
+            background-color: #4CAF50;
+            padding: 15px;
+            margin: -20px -20px 20px -20px;
+            text-align: center;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        .auth-status {
+            color: white;
+            margin-left: 20px;
+            font-size: 14px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .products-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .product-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .product-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin: 10px 0;
+        }
+        .product-description {
+            color: #666;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        .product-price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #4CAF50;
+            margin: 15px 0;
+        }
+        .product-stock {
+            color: #999;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+        .quantity-input {
+            width: 60px;
+            padding: 5px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .add-to-cart-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .add-to-cart-btn:hover {
+            background-color: #45a049;
+        }
+        .add-to-cart-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .message {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .success-message {
+            background-color: #e8f5e9;
+            color: #388e3c;
+            display: none;
+        }
+        .error-message {
+            background-color: #ffebee;
+            color: #d32f2f;
+            display: none;
+        }
+        .no-products {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div style="display: flex; justify-content: center; align-items: center;">
+            <a href="/">Home</a>
+            <a href="/products">Products</a>
+            <a href="/cart">Cart</a>
+            <span id="authLinks"></span>
+        </div>
+    </nav>
+
+    <h1>Our Products</h1>
+
+    <div id="successMessage" class="message success-message"></div>
+    <div id="errorMessage" class="message error-message"></div>
+
+    <div class="products-container">
+        {% if products %}
+            {% for product in products %}
+                <div class="product-card">
+                    <div class="product-name">{{ product.name }}</div>
+                    <div class="product-description">{{ product.description }}</div>
+                    <div class="product-price">${{ "%.2f"|format(product.price) }}</div>
+                    <div class="product-stock">In Stock: {{ product.stock }}</div>
+                    
+                    {% if product.stock > 0 %}
+                        <input type="number" class="quantity-input" id="qty-{{ product.id }}" min="1" max="{{ product.stock }}" value="1">
+                        <button class="add-to-cart-btn" onclick="addToCart({{ product.id }}, &quot;{{ product.name }}&quot;)">Add to Cart</button>
+                    {% else %}
+                        <button class="add-to-cart-btn" disabled>Out of Stock</button>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-products">No products available</div>
+        {% endif %}
+    </div>
+
+    <script>
+        // Check if user is logged in and update auth links
+        function updateAuthStatus() {
+            const token = localStorage.getItem('access_token');
+            const authLinks = document.getElementById('authLinks');
+            
+            if (token) {
+                authLinks.innerHTML = '<a href="/logout" style="margin-left: 20px;">Logout</a>';
+            } else {
+                authLinks.innerHTML = '<a href="/pages/login" style="margin-left: 20px;">Login</a><a href="/pages/register">Register</a>';
+            }
+        }
+
+        // Add to cart function
+        async function addToCart(productId, productName) {
+            const token = localStorage.getItem('access_token');
+            
+            if (!token) {
+                document.getElementById('errorMessage').textContent = 'Please login first';
+                document.getElementById('errorMessage').style.display = 'block';
+                setTimeout(() => {
+                    window.location.href = '/pages/login';
+                }, 1500);
+                return;
+            }
+
+            const quantity = parseInt(document.getElementById('qty-' + productId).value);
+
+            const payload = {
+                product_id: productId,
+                quantity: quantity
+            };
+
+            try {
+                const response = await fetch('/cart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    document.getElementById('successMessage').textContent = `${productName} added to cart!`;
+                    document.getElementById('successMessage').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('successMessage').style.display = 'none';
+                    }, 3000);
+                } else {
+                    const data = await response.json();
+                    document.getElementById('errorMessage').textContent = data.detail || 'Failed to add to cart';
+                    document.getElementById('errorMessage').style.display = 'block';
+                }
+            } catch (error) {
+                document.getElementById('errorMessage').textContent = 'Error: ' + error.message;
+                document.getElementById('errorMessage').style.display = 'block';
+            }
+        }
+
+        // Initialize auth status on page load
+        updateAuthStatus();
+    </script>
+</body>
+</html>

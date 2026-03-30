@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register - My Shop</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .error {
+            color: #d32f2f;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #ffebee;
+            border-radius: 4px;
+            display: none;
+        }
+        .success {
+            color: #388e3c;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #e8f5e9;
+            border-radius: 4px;
+            display: none;
+        }
+        .links {
+            text-align: center;
+            margin-top: 20px;
+        }
+        a {
+            color: #4CAF50;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        nav {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/">Home</a> |
+        <a href="/products">Products</a> |
+        <a href="/pages/login">Login</a>
+    </nav>
+
+    <div class="container">
+        <h1>Register</h1>
+        
+        <div id="error" class="error"></div>
+        <div id="success" class="success"></div>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="full_name">Full Name:</label>
+                <input type="text" id="full_name" name="full_name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password_confirm">Confirm Password:</label>
+                <input type="password" id="password_confirm" name="password_confirm" required>
+            </div>
+
+            <button type="submit">Register</button>
+        </form>
+
+        <div class="links">
+            Already have an account? <a href="/pages/login">Login here</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const full_name = document.getElementById('full_name').value;
+            const password = document.getElementById('password').value;
+            const password_confirm = document.getElementById('password_confirm').value;
+
+            // Validate passwords match
+            if (password !== password_confirm) {
+                document.getElementById('error').textContent = 'Passwords do not match';
+                document.getElementById('error').style.display = 'block';
+                return;
+            }
+
+            const payload = {
+                email: email,
+                full_name: full_name,
+                password: password
+            };
+
+            try {
+                const response = await fetch('/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Show success message
+                    document.getElementById('success').textContent = 'Registration successful! Redirecting to login...';
+                    document.getElementById('success').style.display = 'block';
+
+                    // Redirect to login page after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '/pages/login';
+                    }, 2000);
+                } else {
+                    // Show error message
+                    document.getElementById('error').textContent = data.detail || 'Registration failed';
+                    document.getElementById('error').style.display = 'block';
+                }
+            } catch (error) {
+                document.getElementById('error').textContent = 'An error occurred: ' + error.message;
+                document.getElementById('error').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -14,8 +14,7 @@ app = FastAPI(lifespan=lifespan,title="E-commerce API", description="Backend API
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-
-app.include_router(auth.router)
+app.include_router(auth.router, prefix="/auth")
 app.include_router(products.router)
 app.include_router(cart.router)
 app.include_router(orders.router)

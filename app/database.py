@@ -2,12 +2,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 import os
 
-# Railway environment variable (if set)
-DATABASE_URL = os.getenv("DATABASE_URL")
+# Use environment variable only (Railway will provide it)
+DATABASE_URL = os.getenv("DATABASE_URL", "")
 
-# If not set, use the Railway PostgreSQL URL directly
 if not DATABASE_URL:
-    DATABASE_URL = "postgresql://postgres:fMpjprTyNXneyPfwdGQIzDxtaGPLOKQt@maglev.proxy.rlwy.net:17381/railway"
+    raise ValueError("DATABASE_URL environment variable not set!")
 
 engine = create_engine(DATABASE_URL)
 
@@ -19,4 +18,4 @@ def get_db():
     try:
         yield db
     finally:
-        db.close()
+        db.close()  

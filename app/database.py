@@ -2,11 +2,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 import os
 
-# Get DATABASE_URL from environment variable (set by docker-compose)
+# Railway environment variable (if set)
 DATABASE_URL = os.getenv("DATABASE_URL")
 
+# If not set, use the Railway PostgreSQL URL directly
 if not DATABASE_URL:
-    raise ValueError("DATABASE_URL environment variable not set!")
+    DATABASE_URL = "postgresql://postgres:SHR12febpg@maglev.proxy.rlwy.net:17381/railway"
 
 engine = create_engine(DATABASE_URL)
 

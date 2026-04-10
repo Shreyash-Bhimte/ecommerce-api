@@ -24,7 +24,7 @@ def register_page(request: Request):
     return templates.TemplateResponse(request=request, name="register.html")
 
 
-@router.get("/products", response_class=HTMLResponse)
+@router.get("/shop", response_class=HTMLResponse)
 def products_page(request: Request, db: Session = Depends(get_db)):
     products = db.query(Product).all()
     return templates.TemplateResponse(

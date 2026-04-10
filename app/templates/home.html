@@ -2,15 +2,81 @@
 <html>
 <head>
     <title>My Shop</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        nav {
+            background-color: #4CAF50;
+            padding: 15px;
+            margin: -20px -20px 20px -20px;
+            text-align: center;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        p {
+            color: #666;
+            text-align: center;
+            font-size: 18px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to My Shop</h1>
-    <p>Browse our products and find what you need.</p>
-
     <nav>
-        <a href="/products">Products</a> |
-        <a href="/pages/login">Login</a> |
-        <a href="/pages/register">Register</a>
+        <a href="/">Home</a>
+        <a href="/products">Products</a>
+        <a href="/pages/cart">Cart</a>
+        <span id="authLinks"></span>
     </nav>
+
+    <div class="container">
+        <h1>Welcome to My Shop</h1>
+        <p>Browse our products and find what you need.</p>
+    </div>
+
+    <script>
+        // Check if user is logged in and update auth links
+        function updateAuthStatus() {
+            const token = localStorage.getItem('access_token');
+            const authLinks = document.getElementById('authLinks');
+            
+            if (token) {
+                authLinks.innerHTML = '<a href="#" onclick="logout()" style="margin-left: 20px;">Logout</a>';
+            } else {
+                authLinks.innerHTML = '<a href="/pages/login" style="margin-left: 20px;">Login</a><a href="/pages/register">Register</a>';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('token_type');
+            window.location.href = '/';
+        }
+
+        // Update on page load
+        updateAuthStatus();
+    </script>
 </body>
 </html>
